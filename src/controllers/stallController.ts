@@ -48,15 +48,6 @@ export class StallController {
     }
   };
 
-  getStallMenus = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const menus = await this.stallService.getStallMenus(Number(req.params.id));
-      return res.status(200).json({ status: 'success', data: menus });
-    } catch (error) {
-      return this.handleError(res, error);
-    }
-  };
-
   createStall = async (req: Request, res: Response): Promise<Response> => {
     try {
       const stall = await this.stallService.createStall(req.body);

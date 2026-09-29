@@ -9,11 +9,3 @@ export interface StallResponseDto {
   reviewCount: number;
   isPopular: boolean;
 }
-
-export interface MenuItemDto {
-  id: number;
-  stallId: number;
-  name: string;
-  price: number;
-  isAvailable: boolean;
-}

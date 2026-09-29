@@ -3,24 +3,13 @@ import {
   type CreateStallInput,
   type FindAllParams,
 } from '../repositories/stallRepository.ts';
-import { MenuItemRepository } from '../repositories/menuItemRepository.ts';
-import type { MenuItemDto, StallResponseDto } from '../dtos/stallDto.ts';
+import type { StallResponseDto } from '../dtos/stallDto.ts';
 
 type StallRow = NonNullable<Awaited<ReturnType<StallRepository['findById']>>>;
 
 export class StallService {
-  private stallRepository: StallRepository;
-  private menuItemRepository: MenuItemRepository;
+  constructor(private stallRepository: StallRepository = new StallRepository()) {}
 
-  constructor(
-    stallRepository: StallRepository = new StallRepository(),
-    menuItemRepository: MenuItemRepository = new MenuItemRepository(),
-  ) {
-    this.stallRepository = stallRepository;
-    this.menuItemRepository = menuItemRepository;
-  }
-
-  // Mapping row DB -> DTO API (sekaligus logika bisnis isPopular).
   private toDto(row: StallRow): StallResponseDto {
     const avgRating = Number(row.avgRating);
     return {
@@ -45,12 +34,6 @@ export class StallService {
     const row = await this.stallRepository.findById(id);
     if (!row) throw new Error('STALL_NOT_FOUND');
     return this.toDto(row);
-  }
-
-  async getStallMenus(id: number): Promise<MenuItemDto[]> {
-    const row = await this.stallRepository.findById(id);
-    if (!row) throw new Error('STALL_NOT_FOUND');
-    return this.menuItemRepository.findByStallId(id);
   }
 
   async createStall(input: CreateStallInput): Promise<StallResponseDto> {

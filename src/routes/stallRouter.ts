@@ -9,7 +9,7 @@ stallRouter.get('/', (req, res) => {
   // #swagger.parameters['category'] = { in: 'query', type: 'string' }
   // #swagger.parameters['page']     = { in: 'query', type: 'integer' }
   // #swagger.parameters['limit']    = { in: 'query', type: 'integer' }
-  // #swagger.responses[200] = { description: 'Daftar warung' }
+  // #swagger.responses[200] = { description: 'Daftar warung (filter + pagination)' }
   return stallController.getStalls(req, res);
 });
 
@@ -30,22 +30,13 @@ stallRouter.put('/:id', (req, res) => {
   // #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer' }
   // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/StallInput' } }
   // #swagger.responses[200] = { description: 'Warung ter-update' }
-  // #swagger.responses[404] = { description: 'Tidak ditemukan' }
   return stallController.updateStall(req, res);
 });
 
 stallRouter.delete('/:id', (req, res) => {
   // #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer' }
   // #swagger.responses[200] = { description: 'Warung terhapus' }
-  // #swagger.responses[404] = { description: 'Tidak ditemukan' }
   return stallController.deleteStall(req, res);
-});
-
-stallRouter.get('/:id/menus', (req, res) => {
-  // #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer' }
-  // #swagger.responses[200] = { description: 'Daftar menu' }
-  // #swagger.responses[404] = { description: 'Tidak ditemukan' }
-  return stallController.getStallMenus(req, res);
 });
 
 export { stallRouter };
