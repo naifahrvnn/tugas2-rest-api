@@ -9,9 +9,9 @@ END
 GO
 
 -- 2) Login aplikasi (SQL Authentication).
-IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = 'praktikum_user')
+IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = 'naifa')
 BEGIN
-    CREATE LOGIN praktikum_user
+    CREATE LOGIN naifa
         WITH PASSWORD = N'<GANTI_PASSWORD>',
              DEFAULT_DATABASE = review_kantin;
 END
@@ -21,18 +21,18 @@ GO
 USE review_kantin;
 GO
 
-IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'praktikum_user')
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'naifa')
 BEGIN
-    CREATE USER praktikum_user FOR LOGIN praktikum_user;
+    CREATE USER naifa FOR LOGIN naifa;
 END
 GO
 
-ALTER ROLE db_datareader ADD MEMBER praktikum_user;
-ALTER ROLE db_datawriter ADD MEMBER praktikum_user;
+ALTER ROLE db_datareader ADD MEMBER naifa;
+ALTER ROLE db_datawriter ADD MEMBER naifa;
 GO
 
 -- 4) Verifikasi.
 SELECT name, type_desc, authentication_type_desc
 FROM sys.database_principals
-WHERE name = 'praktikum_user';
+WHERE name = 'naifa';
 GO
