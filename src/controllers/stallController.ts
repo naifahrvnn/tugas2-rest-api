@@ -59,7 +59,24 @@ export class StallController {
 
   updateStall = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const stall = await this.stallService.updateStall(Number(req.params.id), req.body);
+      const stallId = Number(req.params.id);
+      
+      // 1. Ambil data warung dulu untuk mengecek siapa pemiliknya
+      const existingStall = await this.stallService.getStallById(stallId);
+
+      // 2. Cek apakah user yang login bukan Admin DAN bukan pemilik warung tersebut
+      const currentUser = (req as any).user;
+      const ownerId = (existingStall as any).ownerId || (existingStall as any).userId;
+
+      if (currentUser && currentUser.role !== 'admin' && String(ownerId) !== String(currentUser.id || currentUser.sub)) {
+        return res.status(403).json({
+          status: 'fail',
+          message: 'Anda tidak memiliki hak akses untuk mengubah warung milik orang lain',
+        });
+      }
+
+      // 3. Jika lolos (pemilik asli atau admin), jalankan update
+      const stall = await this.stallService.updateStall(stallId, req.body);
       return res.status(200).json({ status: 'success', data: stall });
     } catch (error) {
       return this.handleError(res, error);

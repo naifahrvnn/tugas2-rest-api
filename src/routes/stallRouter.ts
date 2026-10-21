@@ -1,42 +1,60 @@
 import { Router } from 'express';
 import { StallController } from '../controllers/stallController.ts';
+import { ReviewController } from '../controllers/reviewController.ts';
+import { validate } from '../middlewares/validate.ts';
+import { authenticate } from '../middlewares/auth.ts';
+import { authorize } from '../middlewares/authorize.ts';
+import {
+  createStallSchema,
+  idParamSchema,
+  stallQuerySchema,
+  updateStallSchema,
+} from '../schemas/stallSchema.ts';
+import { createReviewSchema } from '../schemas/reviewSchema.ts';
 
 const stallRouter = Router();
 const stallController = new StallController();
+const reviewController = new ReviewController();
 
-stallRouter.get('/', (req, res) => {
-  // #swagger.parameters['search']   = { in: 'query', type: 'string' }
-  // #swagger.parameters['category'] = { in: 'query', type: 'string' }
-  // #swagger.parameters['page']     = { in: 'query', type: 'integer' }
-  // #swagger.parameters['limit']    = { in: 'query', type: 'integer' }
-  // #swagger.responses[200] = { description: 'Daftar warung (filter + pagination)' }
-  return stallController.getStalls(req, res);
-});
+// Route publik
+stallRouter.get('/', validate(stallQuerySchema, 'query'), stallController.getStalls);
+stallRouter.get('/:id', validate(idParamSchema, 'params'), stallController.getStallById);
 
-stallRouter.post('/', (req, res) => {
-  // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/StallInput' } }
-  // #swagger.responses[201] = { description: 'Warung dibuat' }
-  return stallController.createStall(req, res);
-});
 
-stallRouter.get('/:id', (req, res) => {
-  // #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer' }
-  // #swagger.responses[200] = { description: 'Detail warung' }
-  // #swagger.responses[404] = { description: 'Tidak ditemukan' }
-  return stallController.getStallById(req, res);
-});
+// Route terlindungi (Owner & Admin)
+stallRouter.post(
+  '/',
+  authenticate,
+  authorize('owner', 'admin'),
+  validate(createStallSchema, 'body'),
+  stallController.createStall,
+);
 
-stallRouter.put('/:id', (req, res) => {
-  // #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer' }
-  // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/StallInput' } }
-  // #swagger.responses[200] = { description: 'Warung ter-update' }
-  return stallController.updateStall(req, res);
-});
+stallRouter.put(
+  '/:id',
+  authenticate,
+  authorize('owner', 'admin'),
+  validate(idParamSchema, 'params'),
+  validate(updateStallSchema, 'body'),
+  stallController.updateStall,
+);
 
-stallRouter.delete('/:id', (req, res) => {
-  // #swagger.parameters['id'] = { in: 'path', required: true, type: 'integer' }
-  // #swagger.responses[200] = { description: 'Warung terhapus' }
-  return stallController.deleteStall(req, res);
-});
+// Route terlindungi (Semua role yang login)
+stallRouter.post(
+  '/:id/reviews',
+  authenticate,
+  validate(idParamSchema, 'params'),
+  validate(createReviewSchema, 'body'),
+  reviewController.createReview,
+);
+
+// Route khusus Admin
+stallRouter.delete(
+  '/:id',
+  authenticate,
+  authorize('admin'),
+  validate(idParamSchema, 'params'),
+  stallController.deleteStall,
+);
 
 export { stallRouter };

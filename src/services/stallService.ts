@@ -53,4 +53,5 @@ export class StallService {
     if (!row) throw new Error('STALL_NOT_FOUND');
     return this.toDto(row);
   }
+
 }
